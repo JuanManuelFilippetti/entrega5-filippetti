@@ -5,10 +5,14 @@ import handlebars from 'express-handlebars'
 import loginRouter from './routes/login.router.js'
 import viewsRouter from './routes/views.router.js'
 import usersRouter from './routes/users.router.js'
+import autenticationRouter from './routes/autentication.router.js'
+import jwtRouter from './routes/jwt.router.js'
+import { usersCustomRouter } from './routes/users.custom.router.js'
 import session from 'express-session'
 import mongoStore from 'connect-mongo'
 import './persistencia/mongoDB/dbConfig.js'
-
+import passport from 'passport'
+import './passport/passportStrategies.js'
 const app = express()
 
 app.use(express.json())
@@ -23,18 +27,27 @@ app.set('view engine', 'handlebars')
 app.use(cookieParser('secreKeyCookies'))
 
 //sessions
-app.use(session({
-    store: new mongoStore({
-        mongoUrl: 'mongodb+srv://coderhouse:coderhouse@cluster0.sugvijj.mongodb.net/mongoSession43400?retryWrites=true&w=majority'
-    }),
-    secret: 'secretSession',
-    cookie: {maxAge:60000}
-}))
+// app.use(session({
+//     store: new mongoStore({
+//         mongoUrl: 'mongodb+srv://coderhouse:coderhouse@cluster0.sugvijj.mongodb.net/mongoSession43400?retryWrites=true&w=majority'
+//     }),
+//     secret: 'secretSession',
+//     cookie: {maxAge:60000}
+// }))
+
+// passport
+app.use(passport.initialize())
+//app.use(passport.session())
 
 //routes
 app.use('/api/login',loginRouter)
 app.use('/api/views',viewsRouter)
-app.use('/api/users',usersRouter)
+app.use('/api/jwt',jwtRouter)
+app.use('/api/autentication',autenticationRouter)
+
+// Ruteo avanzado y auth
+//app.use('/api/users',usersRouter)
+app.use('/api/users',usersCustomRouter.getRouter())
 
 
 //routes
